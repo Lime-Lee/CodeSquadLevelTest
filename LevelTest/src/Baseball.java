@@ -2,14 +2,14 @@
 public class Baseball {
 
 	public Baseball() {
-		System.out.println("½Å³ª´Â ¾ß±¸ °ÔÀÓ");
+		System.out.println("ì‹ ë‚˜ëŠ” ì•¼êµ¬ ê²Œì„");
 	} // End
 
 	public void play() {
 
-		int[] count = { 0, 0, 0, 0 }; // ½ºÆ®¶óÀÌÅ©, º¼, ¾ÈÅ¸, ¾Æ¿ô
+		int[] count = { 0, 0, 0, 0 }; // ìŠ¤íŠ¸ë¼ì´í¬, ë³¼, ì•ˆíƒ€, ì•„ì›ƒ
 
-		System.out.println("Ã¹ ¹øÂ° Å¸ÀÚ°¡ Å¸¼®¿¡ ÀÔÀåÇß½À´Ï´Ù.");
+		System.out.println("ì²« ë²ˆì§¸ íƒ€ìê°€ íƒ€ì„ì— ì…ì¥í–ˆìŠµë‹ˆë‹¤.");
 
 		while (true) {
 			int randomNum = (int) (Math.random() * 4);
@@ -17,7 +17,7 @@ public class Baseball {
 			checkCount(count, randomNum);
 			loadMessage(count, randomNum);
 			if (count[3] == 3) {
-				System.out.println("ÃÖÁ¾ ¾ÈÅ¸ ¼ö : " + count[2]);
+				System.out.println("ìµœì¢… ì•ˆíƒ€ ìˆ˜ : " + count[2]);
 				System.out.println("GAME OVER");
 				break;
 			} // End if
@@ -28,33 +28,33 @@ public class Baseball {
 	private void loadMessage(int[] count, int randomNum) {
 		switch (randomNum) {
 		case 0:
-			System.out.println("½ºÆ®¶óÀÌÅ©!");
+			System.out.println("ìŠ¤íŠ¸ë¼ì´í¬!");
 			break;
 		case 1:
-			System.out.println("º¼!");
+			System.out.println("ë³¼!");
 			break;
 		case 2:
-			System.out.println("¾ÈÅ¸! ´ÙÀ½ Å¸ÀÚ°¡ Å¸¼®¿¡ ÀÔÀåÇß½À´Ï´Ù.");
+			System.out.println("ì•ˆíƒ€! ë‹¤ìŒ íƒ€ìê°€ íƒ€ì„ì— ì…ì¥í–ˆìŠµë‹ˆë‹¤.");
 			break;
 		case 3:
 			if (count[3] == 3) {
-				System.out.println("¾Æ¿ô!");
+				System.out.println("ì•„ì›ƒ!");
 			} else {
-				System.out.println("¾Æ¿ô! ´ÙÀ½ Å¸ÀÚ°¡ Å¸¼®¿¡ ÀÔÀåÇß½À´Ï´Ù.");
+				System.out.println("ì•„ì›ƒ! ë‹¤ìŒ íƒ€ìê°€ íƒ€ì„ì— ì…ì¥í–ˆìŠµë‹ˆë‹¤.");
 			} // End if
 			break;
 		} // End switch
 		System.out.println(count[0] + "S " + count[1] + "B " + count[3] + "O");
 	} // End method
 
-	private void checkCount(int[] count, int randomNum) { // Ä«¿îÆ® Ã¼Å©
+	private void checkCount(int[] count, int randomNum) { // ì¹´ìš´íŠ¸ ì²´í¬
 		if (randomNum == 2 || randomNum == 3) {
 			count[0] = 0;
 			count[1] = 0;
-		} else if (count[0] == 3) { // ½ºÆ®¶óÀÌÅ©°¡ 3È¸ ´©Àû = 1 ¾Æ¿ô
+		} else if (count[0] == 3) { // ìŠ¤íŠ¸ë¼ì´í¬ê°€ 3íšŒ ëˆ„ì  = 1 ì•„ì›ƒ
 			count[0] = 0;
 			count[3]++;
-		} else if (count[1] == 4) { // º¼ 4È¸ ´©Àû = 1 ¾ÈÅ¸
+		} else if (count[1] == 4) { // ë³¼ 4íšŒ ëˆ„ì  = 1 ì•ˆíƒ€
 			count[1] = 0;
 			count[2]++;
 		} // End if
