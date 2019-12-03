@@ -18,7 +18,7 @@ public class PlayerData {
 		System.out.print(teamNum + "팀의 이름을 입력하세요> ");
 		String teamName = sc.nextLine();
 		ArrayList<Player> playerList = new ArrayList<Player>();
-		for (int playerNum = 1; playerNum < 3; playerNum++) { // playerNum < 10
+		for (int playerNum = 1; playerNum < 10; playerNum++) { // playerNum < 10
 			Player player = inputPlayerData(playerNum);
 			player.setNumber(playerNum);
 			player.setTeamName(teamName);
