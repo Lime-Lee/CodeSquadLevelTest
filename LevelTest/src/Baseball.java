@@ -2,15 +2,12 @@
 public class Baseball {
 
 	public Baseball() {
-		System.out.println("신나는 야구 게임");
+		System.out.println("신나는 야구 게임!");
 	} // End
 
 	public void play() {
-
 		int[] count = { 0, 0, 0, 0 }; // 스트라이크, 볼, 안타, 아웃
-
 		System.out.println("첫 번째 타자가 타석에 입장했습니다.");
-
 		while (true) {
 			int randomNum = (int) (Math.random() * 4);
 			count[randomNum]++;
@@ -22,7 +19,6 @@ public class Baseball {
 				break;
 			} // End if
 		} // End while
-
 	} // End play
 
 	private void loadMessage(int[] count, int randomNum) {
@@ -47,8 +43,8 @@ public class Baseball {
 		System.out.println(count[0] + "S " + count[1] + "B " + count[3] + "O");
 	} // End method
 
-	private void checkCount(int[] count, int randomNum) { // 카운트 체크
-		if (randomNum == 2 || randomNum == 3) {
+	private void checkCount(int[] count, int randomNum) {
+		if (randomNum == 2 || randomNum == 3) { // 안타이거나 아웃일 때
 			count[0] = 0;
 			count[1] = 0;
 		} else if (count[0] == 3) { // 스트라이크가 3회 누적 = 1 아웃
