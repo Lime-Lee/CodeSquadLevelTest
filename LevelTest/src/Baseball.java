@@ -44,15 +44,16 @@ public class Baseball {
 	} // End method
 
 	private void checkCount(int[] count, int randomNum) {
-		if (randomNum == 2 || randomNum == 3) { // 안타이거나 아웃일 때
-			count[0] = 0;
-			count[1] = 0;
-		} else if (count[0] == 3) { // 스트라이크가 3회 누적 = 1 아웃
+		if (count[0] == 3) { // 스트라이크가 3회 누적 = 1 아웃
 			count[0] = 0;
 			count[3]++;
 		} else if (count[1] == 4) { // 볼 4회 누적 = 1 안타
 			count[1] = 0;
 			count[2]++;
+		} // End if
+		if (randomNum == 2 || randomNum == 3) { // 안타이거나 아웃일 때
+			count[0] = 0;
+			count[1] = 0;
 		} // End if
 	} // End method
 
