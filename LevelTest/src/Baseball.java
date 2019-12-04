@@ -11,14 +11,12 @@ public class Baseball {
 	} // End method
 
 	private void play(ArrayList<ArrayList<Player>> teamList) {
-		System.out.println(
-				teamList.get(0).get(0).getTeamName() + " VS " + teamList.get(1).get(0).getTeamName() + "의 시합을 시작합니다.");
+		System.out.println(teamList.get(0).get(0).getTeamName() + " VS " + teamList.get(1).get(0).getTeamName() + "의 시합을 시작합니다.");
 		String[] turn = { "초", "말" };
 		int[] teamScore = { 0, 0 }; // 1팀, 2팀
 		for (int inning = 1; inning < 7; inning++) { // inning < 7
 			for (int turnNum = 0; turnNum < 2; turnNum++) {
-				System.out.println(
-						inning + "회" + turn[turnNum] + " " + teamList.get(turnNum).get(0).getTeamName() + "의 공격");
+				System.out.println(inning + "회" + turn[turnNum] + " " + teamList.get(turnNum).get(0).getTeamName() + "의 공격");
 				int hitPoint = teamAttack(teamList.get(turnNum));
 				teamScore[turnNum] += hitPoint;
 			} // End for
