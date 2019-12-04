@@ -11,7 +11,7 @@ public class Baseball {
 		while (true) {
 			int randomNum = (int) (Math.random() * 4);
 			count[randomNum]++;
-			checkCount(count, randomNum);
+			randomNum = checkCount(count, randomNum);
 			loadMessage(count, randomNum);
 			if (count[3] == 3) {
 				System.out.println("최종 안타 수 : " + count[2]);
@@ -43,18 +43,21 @@ public class Baseball {
 		System.out.println(count[0] + "S " + count[1] + "B " + count[3] + "O");
 	} // End method
 
-	private void checkCount(int[] count, int randomNum) {
+	private int checkCount(int[] count, int randomNum) {
 		if (count[0] == 3) { // 스트라이크가 3회 누적 = 1 아웃
-			count[0] = 0;
+			System.out.println("스트라이크!");
 			count[3]++;
+			randomNum = 3;
 		} else if (count[1] == 4) { // 볼 4회 누적 = 1 안타
-			count[1] = 0;
+			System.out.println("볼!");
 			count[2]++;
+			randomNum = 2;
 		} // End if
 		if (randomNum == 2 || randomNum == 3) { // 안타이거나 아웃일 때
 			count[0] = 0;
 			count[1] = 0;
 		} // End if
+		return randomNum;
 	} // End method
 
 } // End class
