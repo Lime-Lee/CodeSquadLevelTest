@@ -11,46 +11,49 @@ public class Baseball {
 	} // End method
 
 	private void play(ArrayList<ArrayList<Player>> teamList) {
-		int[][] teamScore = { { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };
-		for (int inning = 0; inning < 6; inning++) { // 6회까지
+		int[][] teamScore = { { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } }; // 각 팀의 회차 점수
+		int[][] teamTotCount = { { 0, 0, 0 }, { 0, 0, 0 } }; // 누적 0투구, 1삼진, 2안타
+		Count count = new Count();
+		for (int inning = 0; inning < 6; inning++) { // 6회까지 // inning < 6
+			count.setNowInning(inning);
 			for (int teamNum = 0; teamNum < 2; teamNum++) { // 초, 말
-				teamAttack(teamList, inning, teamNum, teamScore);
+				count.setNowTeamNum(teamNum);
+				teamAttack(teamList, teamScore, teamTotCount, count);
 			} // End for
 		} // End for
 	} // End method
 
-	private void teamAttack(ArrayList<ArrayList<Player>> teamList, int inning, int teamNum, int[][] teamScore) {
-		PlayStatus status = new PlayStatus();
-		status.setNowInning(inning);
-		status.setNowTeamNum(teamNum);
+	private void teamAttack(ArrayList<ArrayList<Player>> teamList, int[][] teamScore, int[][] teamTotCount, Count count) {
+		Score score = new Score();
 		int playerNum = 0;
 		while (true) {
-			if (teamList.get(teamNum).size() == playerNum) { // 마지막 타자일 때
-				playerNum = 0;
-			} // End if
-			status.setNowPlayerNum(playerNum);
-			status = playerAttack(teamList, status, teamScore);
-			if (status.getOut() == 3) { // 아웃이 3회일 때
+			count.setNowPlayerNum(playerNum);
+			playerAttack(teamList, teamScore, teamTotCount, count, score);
+			if (score.getOut() == 3) { // 아웃이 3회일 때
 				break;
 			} // End if
 			playerNum++;
+			if (teamList.get(count.getNowTeamNum()).size() == playerNum) { // 마지막 타자일 때
+				playerNum = 0;
+			} // End if
 		} // End while
 	} // End method
 
-	private PlayStatus playerAttack(ArrayList<ArrayList<Player>> teamList, PlayStatus status, int[][] teamScore) {
+	private void playerAttack(ArrayList<ArrayList<Player>> teamList, int[][] teamScore, int[][] teamTotCount, Count count, Score score) {
 		Billboard b = new Billboard();
 		while (true) {
-			int countNum = bat(teamList.get(status.getNowTeamNum()).get(status.getNowPlayerNum()).getBattingAverage());
-			status.setNowCount(countNum);
-			status = addScore(status);
-			status = checkScore(status);
-			if (3 < status.getHit()) { // 안타 4 이상
-				teamScore[status.getNowTeamNum()][status.getNowInning()] = status.getHit() - 3;
-			} // End if
-			b.output(teamList, status, teamScore);
-			if (status.getNowCount() == 2 || status.getNowCount() == 3) { // 안타, 아웃 => 선수 교체
-				return status;
-			} // End if
+			System.out.println("현재 회차 : " + count.getNowInning());
+			System.out.println("스탑키:"+count.getSkipKey());
+			int countNum = bat(teamList.get(count.getNowTeamNum()).get(count.getNowPlayerNum()).getBattingAverage());
+			count.setNowBatCount(countNum);
+			addScore(count, score, teamTotCount);
+			checkScore(count, score, teamTotCount);
+			if (3 < score.getHit()) // 안타 4 이상
+				teamScore[count.getNowTeamNum()][count.getNowInning()] = score.getHit() - 3;
+			if (count.getSkipKey() == 0 || count.getSkipKey() == count.getNowInning())
+				b.output(teamList, teamScore, teamTotCount, count, score);
+			if (count.getNowBatCount() == 2 || count.getNowBatCount() == 3) // 안타, 아웃 => 선수 교체
+				break;
 		} // End while
 	} // End method
 
@@ -71,32 +74,34 @@ public class Baseball {
 		return countNum;
 	} // End method
 
-	private PlayStatus addScore(PlayStatus status) {
-		if (status.getNowCount() == 0) {
-			status.setStrike(status.getStrike() + 1);
-		} else if (status.getNowCount() == 1) {
-			status.setBall(status.getBall() + 1);
-		} else if (status.getNowCount() == 2) {
-			status.setHit(status.getHit() + 1);
-		} else if (status.getNowCount() == 3) {
-			status.setOut(status.getOut() + 1);
+	private void addScore(Count count, Score score, int[][] teamTotCount) {
+		if (count.getNowBatCount() == 0) {
+			score.setStrike(score.getStrike() + 1);
+		} else if (count.getNowBatCount() == 1) {
+			score.setBall(score.getBall() + 1);
+		} else if (count.getNowBatCount() == 2) {
+			score.setHit(score.getHit() + 1);
+			teamTotCount[count.getNowTeamNum()][2]++; // 안타
+		} else if (count.getNowBatCount() == 3) {
+			score.setOut(score.getOut() + 1);
 		} // End if
-		return status;
 	} // End method
 
-	private PlayStatus checkScore(PlayStatus status) {
-		if (status.getStrike() == 3) { // 스트라이크 3 => 아웃 1
-			status.setOut(status.getOut() + 1);
-			status.setNowCount(3);
-		} else if (status.getBall() == 4) { // 볼 4 => 안타 1
-			status.setHit(status.getHit() + 1);
-			status.setNowCount(2);
+	private void checkScore(Count count, Score score, int[][] teamTotCount) {
+		if (score.getStrike() == 3) { // 스트라이크 3 => 아웃 1
+			score.setOut(score.getOut() + 1);
+			count.setNowBatCount(3);
+			teamTotCount[count.getNowTeamNum()][1]++; // 삼진
+		} else if (score.getBall() == 4) { // 볼 4 => 안타 1
+			score.setHit(score.getHit() + 1);
+			count.setNowBatCount(2);
+			teamTotCount[count.getNowTeamNum()][2]++; // 안타
 		} // End if
-		if (status.getNowCount() == 2 || status.getNowCount() == 3) { // 안타, 아웃 => 초기화
-			status.setStrike(0);
-			status.setBall(0);
+		if (count.getNowBatCount() == 2 || count.getNowBatCount() == 3) { // 안타, 아웃 => 초기화
+			score.setStrike(0);
+			score.setBall(0);
 		} // End if
-		return status;
+		teamTotCount[count.getNowTeamNum()][0]++; // 투구
 	} // End method
 
 } // End class

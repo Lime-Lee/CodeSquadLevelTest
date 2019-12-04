@@ -1,40 +1,20 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Billboard {
 
-	
-//	+------------------------------------+
-//	|            1 2 3 4 5 6  | TOT      | 
-//	| Mouse      0 0 1 1 0 0  |  2       | 
-//	| Cats       0 0 2 0 0 0  |  2       |
-//	|                                    |
-//	|  Mouse                      Cats   |
-//	| 1. 윤지수               1. 김고양  |
-//	| 2. 김정정               2. 이고양  |
-//	| 3. 정호영     S X       3. 박고양  |
-//	| 4. 나두성     B X X X   4.   ...   |
-//	| 5. 김두정     O X X                |
-//	| 5. 김세정                    ...   |
-//	| 6. 김네정 V                        |
-//	| 7. 김오정                    ...   |
-//	| 8. 김육정                          |
-//	| 9. 김칠정                    ...   |
-//	|                                    |
-//	| 투구: 31                     ...   |
-//	| 삼진: 2                            |
-//	| 안타: 8                            |
-//	+------------------------------------+
-	
-	
-	public void output(ArrayList<ArrayList<Player>> teamList, PlayStatus status, int[][] teamScore) {
+	public void output(ArrayList<ArrayList<Player>> teamList, int[][] teamScore, int[][] teamTotCount, Count count, Score score) {
 		outputScore(teamList, teamScore);
 		outputTeamName(teamList);
-		// outputPlayerName(teamList);
+		outputPlayerName(teamList, count, score);
+		outputTotCount(count, teamTotCount);
+		outputText(teamList, count, score);
+		skipMessage(count);
 	} // End method
 
 	private void outputScore(ArrayList<ArrayList<Player>> teamList, int[][] teamScore) {
-		System.out.println("+--------------------------------+");
-		System.out.println("|        1 2 3 4 5 6  | TOT      |");
+		System.out.println("+-----------------------------------+");
+		System.out.println("|            1 2 3 4 5 6  | TOT     |");
 		for (int teamNum = 0; teamNum < teamList.size(); teamNum++) {
 			System.out.print("| ");
 			System.out.print(teamList.get(teamNum).get(0).getTeamName() + " ");
@@ -43,49 +23,130 @@ public class Billboard {
 				System.out.print(teamScore[teamNum][inning] + " ");
 				tot += teamScore[teamNum][inning];
 			} // End for
-			System.out.println(" |  " + tot + "      |");
+			System.out.println(" |  " + tot + "     |");
 		} // End for
-		System.out.println("|                                |");
+		System.out.println("|                                   |");
 	} // End method
 
 	private void outputTeamName(ArrayList<ArrayList<Player>> teamList) {
 		System.out.print("|  ");
 		System.out.print(teamList.get(0).get(0).getTeamName());
-		System.out.print("                  ");
+		System.out.print("           ");
 		System.out.print(teamList.get(1).get(0).getTeamName());
 		System.out.println("  |");
 	} // End method
-	
-	
-	
-	// 초기 빌보드는 1회로 기본값이 세팅 => 출력 기본값
-	// => if 그냥 엔터 -> ++ 해서 다음 회차
-	// => if 숫자 엔터 -> 그 회로 스킵 후 출력
 
-//	System.out.println(
-//	teamList.get(0).get(0).getTeamName() + " VS " + teamList.get(1).get(0).getTeamName() + "의 시합을 시작합니다.");
-//String[] turn = { "초", "말" };
-//int[][] teamPlayStatus = { { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } }; // 1팀, 2팀
-//	System.out.println(
-//			inning + "회" + turn[turnNum] + " " + teamList.get(turnNum).get(0).getTeamName() + "의 공격");
-//	teamPlayStatus[teamNum][inning] += hitPoint;
-//System.out.println("경기 종료");
-//System.out.println(teamList.get(0).get(0).getTeamName() + " VS " + teamList.get(1).get(0).getTeamName());
-//System.out.println(teamPlayStatus[0] + " : " + teamPlayStatus[1]);
-//System.out.println("Thank you!");
-//billboard.output(teamPlayStatus);
+	private void outputPlayerName(ArrayList<ArrayList<Player>> teamList, Count count, Score score) {
+		for (int playerNum = 0; playerNum < 9; playerNum++) {
+			System.out.print("| ");
+			for (int teamNum = 0; teamNum < 2; teamNum++) {
+				System.out.print(teamList.get(teamNum).get(playerNum).getNumber());
+				System.out.print(". " + teamList.get(0).get(playerNum).getName());
+				if (teamNum == 0) {
+					firstV(playerNum, count);
+					outputCount(playerNum, score);
+					lastV(playerNum, count);
+				} // End if
+			} // End for
+			System.out.println(" |");
+		} // End for
+	} // End method
 
-//	private void outputPlayStatus(ArrayList<ArrayList<Player>> teamList, PlayStatus PlayStatus) {
-//		System.out.println("+------------------------------------+");
-//		System.out.println("|            1 2 3 4 5 6  | TOT      |");
-//		System.out.println("| " + teamList.get(0).get(0).getTeamName() + " 0 0 1 1 0 0  |  2       |");
-//		System.out.println("|                                    |");
-//	} // End method
-//
-//	public void outputTeamPlayStatus() {
-//		System.out.println("|  Mouse                      Cats   |");
-//		System.out.println("| 1. 윤지수               1. 김고양  |");
-//		System.out.println();
-//	} // End method
+	private void firstV(int playerNum, Count count) {
+		if (playerNum == count.getNowPlayerNum() && count.getNowTeamNum() == 0) {
+			System.out.print(" V");
+		} else {
+			System.out.print("  ");
+		} // End if
+	} // End method
+
+	private void outputCount(int playerNum, Score score) {
+		if ((playerNum + 1) == 3) {
+			System.out.print("  S ");
+			printX(score.getStrike());
+		} else if ((playerNum + 1) == 4) {
+			System.out.print("  B ");
+			printX(score.getBall());
+		} else if ((playerNum + 1) == 5) {
+			System.out.print("  O ");
+			printX(score.getOut());
+		} else {
+			System.out.print("           ");
+		} // End if
+	} // End method
+
+	private void printX(int score) {
+		if (0 < score) {
+			if (score == 1) {
+				System.out.print("X      ");
+			} else if (score == 2) {
+				System.out.print("X X    ");
+			} else if (score == 3) {
+				System.out.print("X X X  ");
+			} // End if
+		} else {
+			System.out.print("       ");
+		} // End if
+	} // End method
+
+	private void lastV(int playerNum, Count count) {
+		if (playerNum == count.getNowPlayerNum() && count.getNowTeamNum() == 1) {
+			System.out.print("V ");
+		} else {
+			System.out.print("  ");
+		} // End if
+	} // End method
+
+	private void outputTotCount(Count count, int[][] teamTotCount) {
+		System.out.println("|                                   |");
+		String[] word = { "투구: ", "삼진: ", "안타: " };
+		for (int i = 0; i < word.length; i++) {
+			System.out.print("| ");
+			for (int teamNum = 0; teamNum < 2; teamNum++) {
+				System.out.print(word[i] + teamTotCount[teamNum][i]);
+				if (teamNum == 0) System.out.print("               ");
+			} // End for
+			System.out.println(" |");
+		} // End for
+		System.out.println("+-----------------------------------+");
+	} // End method
+
+	private void outputText(ArrayList<ArrayList<Player>> teamList, Count count, Score score) {
+		String[] word = { "스트라이크!", "볼!", "안타!", "아웃!" };
+		System.out.println("");
+		System.out.print((count.getNowPlayerNum() + 1) + "번 타자 ");
+		System.out.println(teamList.get(count.getNowTeamNum()).get(count.getNowPlayerNum()).getName() + "입니다.");
+		System.out.println("");
+		System.out.println(word[count.getNowBatCount()]);
+		System.out.println(score.getStrike() + "S " + score.getBall() + "B " + score.getOut() + "O");
+		System.out.println("");
+	} // End method
+
+	private void skipMessage(Count count) {
+		Scanner sc = new Scanner(System.in);
+		while (true) {
+			System.out.print("다음 투구 보기(enter) or 스킵하고 X회말 후 투구 보기(숫자+enter) ?");
+			String inputKey = sc.nextLine();
+			if (inputKey.length() == 0) {
+				break;
+			} else if (inputKey.length() == 1 && checkInputKey(inputKey, count)) {
+				count.setSkipKey(Integer.parseInt(inputKey));
+				break;
+			} else {
+				System.out.println("잘못 입력하셨습니다. 다시 입력해주세요.");
+			} // End if
+		} // End while
+	} // End method
+
+	private boolean checkInputKey(String inputKey, Count count) {
+		char ch = inputKey.charAt(0);
+		if (Character.isDigit(ch)) {
+			int inputNum = Integer.parseInt(inputKey);
+			if (0 < inputNum && inputNum < 7 && count.getNowInning() <= inputNum) {
+				return true;
+			} // End if
+		} // End if
+		return false;
+	} // End method
 
 } // End class
