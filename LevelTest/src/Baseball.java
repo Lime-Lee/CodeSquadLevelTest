@@ -14,13 +14,27 @@ public class Baseball {
 		int[][] teamScore = { { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } }; // 각 팀의 회차 점수
 		int[][] teamTotCount = { { 0, 0, 0 }, { 0, 0, 0 } }; // 누적 0투구, 1삼진, 2안타
 		Count count = new Count();
-		for (int inning = 0; inning < 6; inning++) { // 6회까지 // inning < 6
+		for (int inning = 0; inning < 6; inning++) { // 6회까지
 			count.setNowInning(inning);
 			for (int teamNum = 0; teamNum < 2; teamNum++) { // 초, 말
 				count.setNowTeamNum(teamNum);
+				if (checkGameOver(teamScore, count)) break;
 				teamAttack(teamList, teamScore, teamTotCount, count);
 			} // End for
 		} // End for
+	} // End method
+
+	private boolean checkGameOver(int[][] teamScore, Count count) {
+		int[] totScore = { 0, 0 };
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 6; j++) {
+				totScore[i] += teamScore[i][j];
+			} // End for
+		} // End for
+		if (count.getNowInning() == 5 && count.getNowTeamNum() == 1 && totScore[0] < totScore[1]) {
+			return true;
+		} // End if
+		return false;
 	} // End method
 
 	private void teamAttack(ArrayList<ArrayList<Player>> teamList, int[][] teamScore, int[][] teamTotCount, Count count) {
@@ -42,15 +56,13 @@ public class Baseball {
 	private void playerAttack(ArrayList<ArrayList<Player>> teamList, int[][] teamScore, int[][] teamTotCount, Count count, Score score) {
 		Billboard b = new Billboard();
 		while (true) {
-			System.out.println("현재 회차 : " + count.getNowInning());
-			System.out.println("스탑키:"+count.getSkipKey());
 			int countNum = bat(teamList.get(count.getNowTeamNum()).get(count.getNowPlayerNum()).getBattingAverage());
 			count.setNowBatCount(countNum);
 			addScore(count, score, teamTotCount);
 			checkScore(count, score, teamTotCount);
 			if (3 < score.getHit()) // 안타 4 이상
 				teamScore[count.getNowTeamNum()][count.getNowInning()] = score.getHit() - 3;
-			if (count.getSkipKey() == 0 || count.getSkipKey() == count.getNowInning())
+			if (count.getSkipKey() == 0 || (count.getSkipKey() - 1) < count.getNowInning())
 				b.output(teamList, teamScore, teamTotCount, count, score);
 			if (count.getNowBatCount() == 2 || count.getNowBatCount() == 3) // 안타, 아웃 => 선수 교체
 				break;

@@ -17,22 +17,22 @@ public class Billboard {
 		System.out.println("|            1 2 3 4 5 6  | TOT     |");
 		for (int teamNum = 0; teamNum < teamList.size(); teamNum++) {
 			System.out.print("| ");
-			System.out.print(teamList.get(teamNum).get(0).getTeamName() + " ");
+			System.out.print(String.format("%-10s", teamList.get(teamNum).get(0).getTeamName()) + " ");
 			int tot = 0;
 			for (int inning = 0; inning < teamScore[teamNum].length; inning++) {
 				System.out.print(teamScore[teamNum][inning] + " ");
 				tot += teamScore[teamNum][inning];
 			} // End for
-			System.out.println(" |  " + tot + "     |");
+			System.out.println(" |  " + String.format("%-2s", tot) + "     |");
 		} // End for
 		System.out.println("|                                   |");
 	} // End method
 
 	private void outputTeamName(ArrayList<ArrayList<Player>> teamList) {
 		System.out.print("|  ");
-		System.out.print(teamList.get(0).get(0).getTeamName());
+		System.out.print(String.format("%-10s", teamList.get(0).get(0).getTeamName()));
 		System.out.print("           ");
-		System.out.print(teamList.get(1).get(0).getTeamName());
+		System.out.print(String.format("%10s", teamList.get(1).get(0).getTeamName()));
 		System.out.println("  |");
 	} // End method
 
@@ -42,15 +42,19 @@ public class Billboard {
 			for (int teamNum = 0; teamNum < 2; teamNum++) {
 				System.out.print(teamList.get(teamNum).get(playerNum).getNumber());
 				System.out.print(". " + teamList.get(0).get(playerNum).getName());
-				if (teamNum == 0) {
-					firstV(playerNum, count);
-					outputCount(playerNum, score);
-					lastV(playerNum, count);
-				} // End if
+				check(teamNum, playerNum, count, score);
 			} // End for
 			System.out.println(" |");
 		} // End for
 	} // End method
+
+	private void check(int teamNum, int playerNum, Count count, Score score) {
+		if (teamNum == 0) {
+			firstV(playerNum, count);
+			outputCount(playerNum, score);
+			lastV(playerNum, count);
+		} // End if
+	}
 
 	private void firstV(int playerNum, Count count) {
 		if (playerNum == count.getNowPlayerNum() && count.getNowTeamNum() == 0) {
@@ -103,7 +107,7 @@ public class Billboard {
 		for (int i = 0; i < word.length; i++) {
 			System.out.print("| ");
 			for (int teamNum = 0; teamNum < 2; teamNum++) {
-				System.out.print(word[i] + teamTotCount[teamNum][i]);
+				System.out.print(word[i] + String.format("%-3s", teamTotCount[teamNum][i]));
 				if (teamNum == 0) System.out.print("               ");
 			} // End for
 			System.out.println(" |");
@@ -133,7 +137,7 @@ public class Billboard {
 				count.setSkipKey(Integer.parseInt(inputKey));
 				break;
 			} else {
-				System.out.println("잘못 입력하셨습니다. 다시 입력해주세요.");
+				System.out.println("잘못 입력하셨습니다. 1~5의 값을 다시 입력해주세요.");
 			} // End if
 		} // End while
 	} // End method
@@ -142,7 +146,7 @@ public class Billboard {
 		char ch = inputKey.charAt(0);
 		if (Character.isDigit(ch)) {
 			int inputNum = Integer.parseInt(inputKey);
-			if (0 < inputNum && inputNum < 7 && count.getNowInning() <= inputNum) {
+			if (0 < inputNum && inputNum < 6 && (count.getNowInning() + 1) <= inputNum) {
 				return true;
 			} // End if
 		} // End if
