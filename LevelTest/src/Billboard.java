@@ -137,7 +137,7 @@ public class Billboard {
 				count.setSkipKey(Integer.parseInt(inputKey));
 				break;
 			} else {
-				System.out.println("잘못 입력하셨습니다. 1~5의 값을 다시 입력해주세요.");
+				System.out.println("잘못 입력하셨습니다. 다시 입력해주세요.");
 			} // End if
 		} // End while
 	} // End method
