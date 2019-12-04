@@ -11,50 +11,45 @@ public class Baseball {
 	} // End method
 
 	private void play(ArrayList<ArrayList<Player>> teamList) {
-		System.out.println(teamList.get(0).get(0).getTeamName() + " VS " + teamList.get(1).get(0).getTeamName() + "의 시합을 시작합니다.");
-		String[] turn = { "초", "말" };
-		int[] teamScore = { 0, 0 }; // 1팀, 2팀
-		for (int inning = 1; inning < 7; inning++) { // inning < 7
-			for (int turnNum = 0; turnNum < 2; turnNum++) {
-				System.out.println(inning + "회" + turn[turnNum] + " " + teamList.get(turnNum).get(0).getTeamName() + "의 공격");
-				int hitPoint = teamAttack(teamList.get(turnNum));
-				teamScore[turnNum] += hitPoint;
+		int[][] teamScore = { { 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0 } };
+		for (int inning = 0; inning < 6; inning++) { // 6회까지
+			for (int teamNum = 0; teamNum < 2; teamNum++) { // 초, 말
+				teamAttack(teamList, inning, teamNum, teamScore);
 			} // End for
 		} // End for
-		System.out.println("경기 종료");
-		System.out.println(teamList.get(0).get(0).getTeamName() + " VS " + teamList.get(1).get(0).getTeamName());
-		System.out.println(teamScore[0] + " : " + teamScore[1]);
-		System.out.println("Thank you!");
 	} // End method
 
-	private int teamAttack(ArrayList<Player> playerList) {
-		Score score = new Score();
+	private void teamAttack(ArrayList<ArrayList<Player>> teamList, int inning, int teamNum, int[][] teamScore) {
+		PlayStatus status = new PlayStatus();
+		status.setNowInning(inning);
+		status.setNowTeamNum(teamNum);
 		int playerNum = 0;
 		while (true) {
-			if (playerList.size() == playerNum) {
+			if (teamList.get(teamNum).size() == playerNum) { // 마지막 타자일 때
 				playerNum = 0;
 			} // End if
-			score = playerAttack(playerList.get(playerNum), score);
-			if (score.getOut() == 3) { // 아웃이 3회일 때
+			status.setNowPlayerNum(playerNum);
+			status = playerAttack(teamList, status, teamScore);
+			if (status.getOut() == 3) { // 아웃이 3회일 때
 				break;
 			} // End if
 			playerNum++;
 		} // End while
-		if (3 < score.getHit())
-			return score.getHit() - 3;
-		else
-			return 0;
 	} // End method
 
-	private Score playerAttack(Player player, Score score) {
-		System.out.println(player.getNumber() + "번 " + player.getName());
+	private PlayStatus playerAttack(ArrayList<ArrayList<Player>> teamList, PlayStatus status, int[][] teamScore) {
+		Billboard b = new Billboard();
 		while (true) {
-			score.setNowCount(bat(player.getBattingAverage()));
-			score = checkScore(score); // 0스트라이크 1볼 2안타 3아웃
-			score = checkCount(score);
-			System.out.println(score.getStrike() + "S " + score.getBall() + "B " + score.getOut() + "O");
-			if (score.getNowCount() == 2 || score.getNowCount() == 3) {
-				return score;
+			int countNum = bat(teamList.get(status.getNowTeamNum()).get(status.getNowPlayerNum()).getBattingAverage());
+			status.setNowCount(countNum);
+			status = addScore(status);
+			status = checkScore(status);
+			if (3 < status.getHit()) { // 안타 4 이상
+				teamScore[status.getNowTeamNum()][status.getNowInning()] = status.getHit() - 3;
+			} // End if
+			b.output(teamList, status, teamScore);
+			if (status.getNowCount() == 2 || status.getNowCount() == 3) { // 안타, 아웃 => 선수 교체
+				return status;
 			} // End if
 		} // End while
 	} // End method
@@ -76,38 +71,32 @@ public class Baseball {
 		return countNum;
 	} // End method
 
-	private Score checkScore(Score score) {
-		if (score.getNowCount() == 0) {
-			System.out.println("스트라이크!");
-			score.setStrike(score.getStrike() + 1);
-		} else if (score.getNowCount() == 1) {
-			System.out.println("볼!");
-			score.setBall(score.getBall() + 1);
-		} else if (score.getNowCount() == 2) {
-			System.out.println("안타!");
-			score.setHit(score.getHit() + 1);
-		} else if (score.getNowCount() == 3) {
-			System.out.println("아웃!");
-			score.setOut(score.getOut() + 1);
+	private PlayStatus addScore(PlayStatus status) {
+		if (status.getNowCount() == 0) {
+			status.setStrike(status.getStrike() + 1);
+		} else if (status.getNowCount() == 1) {
+			status.setBall(status.getBall() + 1);
+		} else if (status.getNowCount() == 2) {
+			status.setHit(status.getHit() + 1);
+		} else if (status.getNowCount() == 3) {
+			status.setOut(status.getOut() + 1);
 		} // End if
-		return score;
+		return status;
 	} // End method
 
-	private Score checkCount(Score score) { // 카운트 체크
-		if (score.getStrike() == 3) { // 스트라이크가 3회 누적 = 1 아웃
-			score.setOut(score.getOut() + 1);
-			score.setNowCount(3);
-			System.out.println("아웃!");
-		} else if (score.getBall() == 4) { // 볼 4회 누적 = 1 안타
-			score.setHit(score.getHit() + 1);
-			score.setNowCount(2);
-			System.out.println("안타!");
+	private PlayStatus checkScore(PlayStatus status) {
+		if (status.getStrike() == 3) { // 스트라이크 3 => 아웃 1
+			status.setOut(status.getOut() + 1);
+			status.setNowCount(3);
+		} else if (status.getBall() == 4) { // 볼 4 => 안타 1
+			status.setHit(status.getHit() + 1);
+			status.setNowCount(2);
 		} // End if
-		if (score.getNowCount() == 2 || score.getNowCount() == 3) { // 안타, 아웃일 때 초기화
-			score.setStrike(0);
-			score.setBall(0);
+		if (status.getNowCount() == 2 || status.getNowCount() == 3) { // 안타, 아웃 => 초기화
+			status.setStrike(0);
+			status.setBall(0);
 		} // End if
-		return score;
+		return status;
 	} // End method
 
 } // End class
